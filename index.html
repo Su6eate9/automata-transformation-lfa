@@ -833,11 +833,11 @@
             afnData.alphabet.forEach((symbol) => {
               afdTransitions["∅"][symbol] = "∅";
             });
-            log += `\n Estado morto ∅ adicionado\n`;
+            log += `\nEstado morto ∅ adicionado\n`;
           }
         }
 
-        log += "\n Passo 3: Estados finais do AFD\n";
+        log += "\nPasso 3: Estados finais do AFD\n";
         afdFinals.forEach((state) => {
           const originalStates = stateMap.get(state);
           const finalStates = originalStates.filter((s) =>
