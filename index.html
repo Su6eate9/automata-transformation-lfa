@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conversor AFe → AFN → AFD</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #ccc;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .header {
+        background: #000000;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .nav-tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .nav-tab {
+        flex: 1;
+        padding: 15px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        color: #667eea;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+      }
+
+      .nav-tab.active {
+        background: white;
+        border-bottom-color: #667eea;
+        color: #333;
+      }
+
+      .nav-tab:hover {
+        background: #e9ecef;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 30px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .step-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border-radius: 10px;
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+      }
+
+      .step-title {
+        color: #667eea;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 5px;
+        transition: transform 0.3s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .result-section {
+        margin-top: 30px;
+        padding: 20px;
+        background: #e8f5e8;
+        border-radius: 10px;
+        border-left: 4px solid #28a745;
+      }
+
+      .automaton-display {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .automaton-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .automaton-title {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .transition-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .transition-table th,
+      .transition-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .transition-table th {
+        background: #f8f9fa;
+        font-weight: bold;
+      }
+
+      .epsilon {
+        font-style: italic;
+        color: #666;
+      }
+
+      .step-log {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .example-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .example-title {
+        color: #856404;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .conversion-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+
+      .flow-arrow {
+        margin: 0 15px;
+        color: #667eea;
+      }
+
+      .final-state {
+        background: #28a745;
+        color: white;
+        font-weight: bold;
+      }
+
+      .initial-state {
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Conversor de Autômatos Finitos</h1>
+        <p>Transformações: AFe → AFN → AFD</p>
+        <div class="conversion-flow">
+          <span>AFe</span>
+          <span class="flow-arrow">→</span>
+          <span>AFN</span>
+          <span class="flow-arrow">→</span>
+          <span>AFD</span>
+        </div>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('afe-tab')">
+          AFe → AFN
+        </button>
+        <button class="nav-tab" onclick="showTab('afn-tab')">AFN → AFD</button>
+      </div>
+
+      <div id="afe-tab" class="tab-content active">
+        <div class="example-section">
+          <div class="example-title">Exemplo AFe → AFN:</div>
+          <p><strong>Estados:</strong> 0, 1, 2</p>
+          <p><strong>Estado inicial:</strong> 0</p>
+          <p><strong>Função programa:</strong> δ(0,a)=1, δ(0,ε)=2, δ(1,b)=2</p>
+          <p><strong>Estados finais:</strong> 1, 2</p>
+        </div>
+
+        <div class="step-section">
+          <div class="step-title">Passo 1: Definir o AFe</div>
+
+          <div class="input-group">
+            <label for="afe-states">Estados (separados por vírgula):</label>
+            <input
+              type="text"
+              id="afe-states"
+              placeholder="Ex: 0, 1, 2"
+              value="0, 1, 2"
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="afe-alphabet">Alfabeto (separados por vírgula):</label>
+            <input
+              type="text"
+              id="afe-alphabet"
+              placeholder="Ex: a, b"
+              value="a, b"
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="afe-initial">Estado inicial:</label>
+            <input type="text" id="afe-initial" placeholder="Ex: 0" value="0" />
+          </div>
+
+          <div class="input-group">
+            <label for="afe-transitions"
+              >Transições (uma por linha no formato:
+              origem,símbolo,destino):</label
+            >
+            <textarea
+              id="afe-transitions"
+              placeholder="Ex:
+0,a,1
+0,ε,2
+1,b,2"
+            >
+0,a,1
+0,ε,2
+1,b,2</textarea
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="afe-finals"
+              >Estados finais (separados por vírgula):</label
+            >
+            <input
+              type="text"
+              id="afe-finals"
+              placeholder="Ex: 1, 2"
+              value="1, 2"
+            />
+          </div>
+
+          <button class="btn" onclick="processAFe()">Processar AFe</button>
+          <button class="btn" onclick="convertAFeToAFN()">
+            Converter AFe → AFN
+          </button>
+          <button class="btn" onclick="clearAFeInputs()">Limpar</button>
+        </div>
+
+        <div id="afe-stepLog" class="step-log" style="display: none"></div>
+        <div id="afe-results" class="result-section" style="display: none">
+          <h3>Resultados AFe → AFN</h3>
+          <div id="afe-automatonDisplay" class="automaton-display"></div>
+        </div>
+      </div>
+
+      <div id="afn-tab" class="tab-content">
+        <div class="example-section">
+          <div class="example-title">Exemplo AFN → AFD:</div>
+          <p><strong>Estados:</strong> 0, 1, 2, 3</p>
+          <p><strong>Estado inicial:</strong> 0</p>
+          <p>
+            <strong>Função programa:</strong> δ(0,a)=2, δ(0,a)=3, δ(2,b)=1,
+            δ(1,b)=0
+          </p>
+          <p><strong>Estados finais:</strong> 0, 3</p>
+        </div>
+
+        <div class="step-section">
+          <div class="step-title">🔧 Passo 1: Definir o AFN</div>
+
+          <div class="input-group">
+            <label for="afn-states">Estados (separados por vírgula):</label>
+            <input
+              type="text"
+              id="afn-states"
+              placeholder="Ex: 0, 1, 2, 3"
+              value="0, 1, 2, 3"
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="afn-alphabet">Alfabeto (separados por vírgula):</label>
+            <input
+              type="text"
+              id="afn-alphabet"
+              placeholder="Ex: a, b"
+              value="a, b"
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="afn-initial">Estado inicial:</label>
+            <input type="text" id="afn-initial" placeholder="Ex: 0" value="0" />
+          </div>
+
+          <div class="input-group">
+            <label for="afn-transitions"
+              >Transições (uma por linha no formato:
+              origem,símbolo,destino):</label
+            >
+            <textarea
+              id="afn-transitions"
+              placeholder="Ex:
+0,a,2
+0,a,3
+2,b,1
+1,b,0"
+            >
+0,a,2
+0,a,3
+2,b,1
+1,b,0</textarea
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="afn-finals"
+              >Estados finais (separados por vírgula):</label
+            >
+            <input
+              type="text"
+              id="afn-finals"
+              placeholder="Ex: 0, 3"
+              value="0, 3"
+            />
+          </div>
+
+          <button class="btn" onclick="processAFN()">Processar AFN</button>
+          <button class="btn" onclick="convertAFNToAFD()">
+            Converter AFN → AFD
+          </button>
+          <button class="btn" onclick="clearAFNInputs()">Limpar</button>
+        </div>
+
+        <div id="afn-stepLog" class="step-log" style="display: none"></div>
+        <div id="afn-results" class="result-section" style="display: none">
+          <h3>Resultados AFN → AFD</h3>
+          <div id="afn-automatonDisplay" class="automaton-display"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let afeData = null;
+      let afnFromAFe = null;
+      let afnData = null;
+      let afdData = null;
+
+      function showTab(tabId) {
+        document.querySelectorAll(".tab-content").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".nav-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        document.getElementById(tabId).classList.add("active");
+        event.target.classList.add("active");
+      }
+
+      function processAFe() {
+        try {
+          const states = document
+            .getElementById("afe-states")
+            .value.split(",")
+            .map((s) => s.trim());
+          const alphabet = document
+            .getElementById("afe-alphabet")
+            .value.split(",")
+            .map((s) => s.trim());
+          const initial = document.getElementById("afe-initial").value.trim();
+          const finals = document
+            .getElementById("afe-finals")
+            .value.split(",")
+            .map((s) => s.trim());
+
+          const transitionLines = document
+            .getElementById("afe-transitions")
+            .value.split("\n");
+          const transitions = {};
+
+          states.forEach((state) => {
+            transitions[state] = {};
+            [...alphabet, "ε"].forEach((symbol) => {
+              transitions[state][symbol] = [];
+            });
+          });
+
+          transitionLines.forEach((line) => {
+            line = line.trim();
+            if (line) {
+              const [from, symbol, to] = line.split(",").map((s) => s.trim());
+              if (!transitions[from][symbol]) {
+                transitions[from][symbol] = [];
+              }
+              transitions[from][symbol].push(to);
+            }
+          });
+
+          afeData = {
+            states,
+            alphabet,
+            initial,
+            finals,
+            transitions,
+          };
+
+          alert("✅ AFe processado com sucesso!");
+        } catch (error) {
+          alert("❌ Erro ao processar AFe: " + error.message);
+        }
+      }
+
+      function epsilonClosure(states, transitions) {
+        const closure = new Set(states);
+        const stack = [...states];
+
+        while (stack.length > 0) {
+          const current = stack.pop();
+          if (transitions[current] && transitions[current]["ε"]) {
+            transitions[current]["ε"].forEach((next) => {
+              if (!closure.has(next)) {
+                closure.add(next);
+                stack.push(next);
+              }
+            });
+          }
+        }
+
+        return Array.from(closure);
+      }
+
+      function convertAFeToAFN() {
+        if (!afeData) {
+          alert("❌ Primeiro processe o AFe!");
+          return;
+        }
+
+        let log = "INICIANDO CONVERSÃO AFe → AFN\n\n";
+
+        log += "Passo 1: Calculando ε-closure para cada estado\n";
+        const epsilonClosures = {};
+
+        afeData.states.forEach((state) => {
+          const closure = epsilonClosure([state], afeData.transitions);
+          epsilonClosures[state] = closure;
+          log += `ε-closure(${state}) = {${closure.join(", ")}}\n`;
+        });
+
+        log += "\n";
+
+        log +=
+          "Passo 2: Construindo novas transições (eliminando ε-transições)\n";
+        const newTransitions = {};
+
+        afeData.states.forEach((state) => {
+          newTransitions[state] = {};
+          afeData.alphabet.forEach((symbol) => {
+            newTransitions[state][symbol] = [];
+          });
+        });
+
+        afeData.states.forEach((state) => {
+          const closure = epsilonClosures[state];
+
+          afeData.alphabet.forEach((symbol) => {
+            const reachable = new Set();
+
+            closure.forEach((closureState) => {
+              if (afeData.transitions[closureState][symbol]) {
+                afeData.transitions[closureState][symbol].forEach((target) => {
+                  const targetClosure = epsilonClosures[target];
+                  targetClosure.forEach((t) => reachable.add(t));
+                });
+              }
+            });
+
+            newTransitions[state][symbol] = Array.from(reachable);
+
+            if (reachable.size > 0) {
+              log += `δ'(${state}, ${symbol}) = {${Array.from(reachable).join(
+                ", "
+              )}}\n`;
+            }
+          });
+        });
+
+        log += "\n";
+
+        log += "Passo 3: Determinando novos estados finais\n";
+        const newFinals = [];
+
+        afeData.states.forEach((state) => {
+          const closure = epsilonClosures[state];
+          const containsFinal = closure.some((s) => afeData.finals.includes(s));
+
+          if (containsFinal) {
+            newFinals.push(state);
+            log += `Estado ${state} é final (ε-closure contém: ${closure
+              .filter((s) => afeData.finals.includes(s))
+              .join(", ")})\n`;
+          }
+        });
+
+        log += "\n✅ CONVERSÃO AFe → AFN CONCLUÍDA!\n";
+
+        afnFromAFe = {
+          states: afeData.states,
+          alphabet: afeData.alphabet,
+          initial: afeData.initial,
+          finals: newFinals,
+          transitions: newTransitions,
+        };
+
+        document.getElementById("afe-stepLog").textContent = log;
+        document.getElementById("afe-stepLog").style.display = "block";
+
+        displayAFeResults();
+      }
+
+      function displayAFeResults() {
+        const resultsDiv = document.getElementById("afe-results");
+        const displayDiv = document.getElementById("afe-automatonDisplay");
+
+        displayDiv.innerHTML = "";
+
+        const afeCard = createAutomatonCard("AFe Original", afeData, true);
+        displayDiv.appendChild(afeCard);
+
+        const afnCard = createAutomatonCard(
+          "AFN Resultante",
+          afnFromAFe,
+          false
+        );
+        displayDiv.appendChild(afnCard);
+
+        resultsDiv.style.display = "block";
+      }
+
+      function clearAFeInputs() {
+        document.getElementById("afe-states").value = "";
+        document.getElementById("afe-alphabet").value = "";
+        document.getElementById("afe-initial").value = "";
+        document.getElementById("afe-transitions").value = "";
+        document.getElementById("afe-finals").value = "";
+        document.getElementById("afe-results").style.display = "none";
+        document.getElementById("afe-stepLog").style.display = "none";
+        afeData = null;
+        afnFromAFe = null;
+      }
+
+      function processAFN() {
+        try {
+          const states = document
+            .getElementById("afn-states")
+            .value.split(",")
+            .map((s) => s.trim());
+          const alphabet = document
+            .getElementById("afn-alphabet")
+            .value.split(",")
+            .map((s) => s.trim());
+          const initial = document.getElementById("afn-initial").value.trim();
+          const finals = document
+            .getElementById("afn-finals")
+            .value.split(",")
+            .map((s) => s.trim());
+
+          const transitionLines = document
+            .getElementById("afn-transitions")
+            .value.split("\n");
+          const transitions = {};
+
+          states.forEach((state) => {
+            transitions[state] = {};
+            alphabet.forEach((symbol) => {
+              transitions[state][symbol] = [];
+            });
+          });
+
+          transitionLines.forEach((line) => {
+            line = line.trim();
+            if (line) {
+              const [from, symbol, to] = line.split(",").map((s) => s.trim());
+              if (!transitions[from][symbol]) {
+                transitions[from][symbol] = [];
+              }
+              transitions[from][symbol].push(to);
+            }
+          });
+
+          afnData = {
+            states,
+            alphabet,
+            initial,
+            finals,
+            transitions,
+          };
+
+          alert("✅ AFN processado com sucesso!");
+        } catch (error) {
+          alert("❌ Erro ao processar AFN: " + error.message);
+        }
+      }
+
+      function convertAFNToAFD() {
+        if (!afnData) {
+          alert("❌ Primeiro processe o AFN!");
+          return;
+        }
+
+        let log =
+          "INICIANDO CONVERSÃO AFN → AFD (Algoritmo de Construção de Subconjuntos)\n\n";
+
+        log += "Passo 1: Estado inicial do AFD\n";
+        const initialSet = [afnData.initial];
+        const initialSetKey = `{${initialSet.sort().join(",")}}`;
+        log += `Estado inicial do AFD: ${initialSetKey}\n\n`;
+
+        const afdStates = [];
+        const afdTransitions = {};
+        const afdFinals = [];
+        const stateMap = new Map();
+        const queue = [];
+
+        afdStates.push(initialSetKey);
+        afdTransitions[initialSetKey] = {};
+        stateMap.set(initialSetKey, initialSet);
+        queue.push(initialSetKey);
+
+        if (initialSet.some((s) => afnData.finals.includes(s))) {
+          afdFinals.push(initialSetKey);
+          log += `Estado inicial ${initialSetKey} é final\n`;
+        }
+
+        log += "Passo 2: Construindo estados e transições do AFD\n";
+
+        while (queue.length > 0) {
+          const currentStateKey = queue.shift();
+          const currentStateSet = stateMap.get(currentStateKey);
+
+          log += `\n Processando estado ${currentStateKey} = ${JSON.stringify(
+            currentStateSet
+          )}\n`;
+
+          afnData.alphabet.forEach((symbol) => {
+            const nextStateSet = new Set();
+
+            currentStateSet.forEach((state) => {
+              if (afnData.transitions[state][symbol]) {
+                afnData.transitions[state][symbol].forEach((nextState) => {
+                  nextStateSet.add(nextState);
+                });
+              }
+            });
+
+            const nextStateArray = Array.from(nextStateSet).sort();
+            const nextStateKey =
+              nextStateArray.length > 0 ? `{${nextStateArray.join(",")}}` : "∅";
+
+            afdTransitions[currentStateKey][symbol] = nextStateKey;
+
+            if (nextStateArray.length > 0) {
+              log += `δ(${currentStateKey}, ${symbol}) = ${nextStateKey}\n`;
+
+              if (!stateMap.has(nextStateKey)) {
+                afdStates.push(nextStateKey);
+                afdTransitions[nextStateKey] = {};
+                stateMap.set(nextStateKey, nextStateArray);
+                queue.push(nextStateKey);
+
+                if (nextStateArray.some((s) => afnData.finals.includes(s))) {
+                  afdFinals.push(nextStateKey);
+                  log += `Estado ${nextStateKey} é final\n`;
+                }
+              }
+            } else {
+              log += `δ(${currentStateKey}, ${symbol}) = ∅ (estado morto)\n`;
+            }
+          });
+        }
+
+        if (
+          Object.values(afdTransitions).some((trans) =>
+            Object.values(trans).includes("∅")
+          )
+        ) {
+          if (!afdStates.includes("∅")) {
+            afdStates.push("∅");
+            afdTransitions["∅"] = {};
+            afnData.alphabet.forEach((symbol) => {
+              afdTransitions["∅"][symbol] = "∅";
+            });
+            log += `\n💀 Estado morto ∅ adicionado\n`;
+          }
+        }
+
+        log += "\n🎯 Passo 3: Estados finais do AFD\n";
+        afdFinals.forEach((state) => {
+          const originalStates = stateMap.get(state);
+          const finalStates = originalStates.filter((s) =>
+            afnData.finals.includes(s)
+          );
+          log += `${state} é final (contém: ${finalStates.join(", ")})\n`;
+        });
+
+        log += "\n✅ CONVERSÃO AFN → AFD CONCLUÍDA!\n";
+        log += `\nResumo do AFD:\n`;
+        log += `Estados: ${afdStates.length}\n`;
+        log += `Estados finais: ${afdFinals.length}\n`;
+        log += `Transições: ${
+          Object.keys(afdTransitions).length * afnData.alphabet.length
+        }\n`;
+
+        afdData = {
+          states: afdStates,
+          alphabet: afnData.alphabet,
+          initial: initialSetKey,
+          finals: afdFinals,
+          transitions: afdTransitions,
+        };
+
+        document.getElementById("afn-stepLog").textContent = log;
+        document.getElementById("afn-stepLog").style.display = "block";
+
+        displayAFNResults();
+      }
+
+      function displayAFNResults() {
+        const resultsDiv = document.getElementById("afn-results");
+        const displayDiv = document.getElementById("afn-automatonDisplay");
+
+        displayDiv.innerHTML = "";
+
+        const afnCard = createAutomatonCard("AFN Original", afnData, false);
+        displayDiv.appendChild(afnCard);
+
+        const afdCard = createAutomatonCard("AFD Resultante", afdData, false);
+        displayDiv.appendChild(afdCard);
+
+        resultsDiv.style.display = "block";
+      }
+
+      function clearAFNInputs() {
+        document.getElementById("afn-states").value = "";
+        document.getElementById("afn-alphabet").value = "";
+        document.getElementById("afn-initial").value = "";
+        document.getElementById("afn-transitions").value = "";
+        document.getElementById("afn-finals").value = "";
+        document.getElementById("afn-results").style.display = "none";
+        document.getElementById("afn-stepLog").style.display = "none";
+        afnData = null;
+        afdData = null;
+      }
+
+      function createAutomatonCard(title, data, showEpsilon) {
+        const card = document.createElement("div");
+        card.className = "automaton-card";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "automaton-title";
+        titleEl.textContent = title;
+        card.appendChild(titleEl);
+
+        const info = document.createElement("div");
+        info.innerHTML = `
+                <p><strong>Estados:</strong> {${data.states.join(", ")}}</p>
+                <p><strong>Alfabeto:</strong> {${data.alphabet.join(", ")}}</p>
+                <p><strong>Estado inicial:</strong> ${data.initial}</p>
+                <p><strong>Estados finais:</strong> {${data.finals.join(
+                  ", "
+                )}}</p>
+            `;
+        card.appendChild(info);
+
+        const table = document.createElement("table");
+        table.className = "transition-table";
+
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        headerRow.innerHTML = "<th>Estado</th>";
+
+        const symbols = showEpsilon ? [...data.alphabet, "ε"] : data.alphabet;
+        symbols.forEach((symbol) => {
+          const th = document.createElement("th");
+          th.innerHTML =
+            symbol === "ε" ? '<span class="epsilon">ε</span>' : symbol;
+          headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        data.states.forEach((state) => {
+          const row = document.createElement("tr");
+
+          const stateCell = document.createElement("td");
+          stateCell.innerHTML = `<strong>${state}</strong>`;
+
+          if (state === data.initial) {
+            stateCell.classList.add("initial-state");
+          }
+          if (data.finals.includes(state)) {
+            stateCell.classList.add("final-state");
+          }
+
+          row.appendChild(stateCell);
+
+          symbols.forEach((symbol) => {
+            const cell = document.createElement("td");
+            const transitions = data.transitions[state][symbol] || [];
+
+            if (Array.isArray(transitions)) {
+              cell.textContent =
+                transitions.length > 0 ? `{${transitions.join(", ")}}` : "∅";
+            } else {
+              cell.textContent = transitions || "∅";
+            }
+
+            row.appendChild(cell);
+          });
+
+          tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        card.appendChild(table);
+
+        return card;
+      }
+    </script>
+  </body>
+</html>
