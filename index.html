@@ -519,7 +519,37 @@
 
           const transitionLines = document
             .getElementById("afe-transitions")
-            .value.split("\n");
+            .value.split("\n")
+            .filter((line) => line.trim() !== "");
+
+          // Validações das regras
+          if (states.length > 5) {
+            alert(
+              "❌ Erro: O AFe deve ter no máximo 5 estados. Atualmente tem " +
+                states.length +
+                " estados."
+            );
+            return;
+          }
+
+          if (alphabet.length > 3) {
+            alert(
+              "❌ Erro: O AFe deve ter no máximo 3 símbolos no alfabeto. Atualmente tem " +
+                alphabet.length +
+                " símbolos."
+            );
+            return;
+          }
+
+          if (transitionLines.length > 7) {
+            alert(
+              "❌ Erro: O AFe deve ter no máximo 7 transições. Atualmente tem " +
+                transitionLines.length +
+                " transições."
+            );
+            return;
+          }
+
           const transitions = {};
 
           states.forEach((state) => {
@@ -710,7 +740,37 @@
 
           const transitionLines = document
             .getElementById("afn-transitions")
-            .value.split("\n");
+            .value.split("\n")
+            .filter((line) => line.trim() !== "");
+
+          // Validações das regras
+          if (states.length > 4) {
+            alert(
+              "❌ Erro: O AFN deve ter no máximo 4 estados. Atualmente tem " +
+                states.length +
+                " estados."
+            );
+            return;
+          }
+
+          if (alphabet.length > 3) {
+            alert(
+              "❌ Erro: O AFN deve ter no máximo 3 símbolos no alfabeto. Atualmente tem " +
+                alphabet.length +
+                " símbolos."
+            );
+            return;
+          }
+
+          if (transitionLines.length > 8) {
+            alert(
+              "❌ Erro: O AFN deve ter no máximo 8 transições. Atualmente tem " +
+                transitionLines.length +
+                " transições."
+            );
+            return;
+          }
+
           const transitions = {};
 
           states.forEach((state) => {
@@ -906,13 +966,11 @@
 
         const info = document.createElement("div");
         info.innerHTML = `
-                <p><strong>Estados:</strong> {${data.states.join(", ")}}</p>
-                <p><strong>Alfabeto:</strong> {${data.alphabet.join(", ")}}</p>
-                <p><strong>Estado inicial:</strong> ${data.initial}</p>
-                <p><strong>Estados finais:</strong> {${data.finals.join(
-                  ", "
-                )}}</p>
-            `;
+            <p><strong>Estados:</strong> {${data.states.join(", ")}}</p>
+            <p><strong>Alfabeto:</strong> {${data.alphabet.join(", ")}}</p>
+            <p><strong>Estado inicial:</strong> ${data.initial}</p>
+            <p><strong>Estados finais:</strong> {${data.finals.join(", ")}}</p>
+        `;
         card.appendChild(info);
 
         const table = document.createElement("table");
