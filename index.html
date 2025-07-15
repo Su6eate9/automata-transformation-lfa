@@ -257,7 +257,6 @@
         font-weight: bold;
       }
 
-      /* Scrollbar styling for dark mode */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -276,19 +275,16 @@
         background: #484f58;
       }
 
-      /* Selection styling */
       ::selection {
         background: #7c3aed;
         color: white;
       }
 
-      /* Input placeholder styling */
       input::placeholder,
       textarea::placeholder {
         color: #6e7681;
       }
 
-      /* Better contrast for example section */
       .example-section p {
         color: #e6edf3;
       }
@@ -413,7 +409,7 @@
         </div>
 
         <div class="step-section">
-          <div class="step-title">🔧 Passo 1: Definir o AFN</div>
+          <div class="step-title">Passo 1: Definir o AFN</div>
 
           <div class="input-group">
             <label for="afn-states">Estados (separados por vírgula):</label>
@@ -837,11 +833,11 @@
             afnData.alphabet.forEach((symbol) => {
               afdTransitions["∅"][symbol] = "∅";
             });
-            log += `\n💀 Estado morto ∅ adicionado\n`;
+            log += `\n Estado morto ∅ adicionado\n`;
           }
         }
 
-        log += "\n🎯 Passo 3: Estados finais do AFD\n";
+        log += "\n Passo 3: Estados finais do AFD\n";
         afdFinals.forEach((state) => {
           const originalStates = stateMap.get(state);
           const finalStates = originalStates.filter((s) =>
