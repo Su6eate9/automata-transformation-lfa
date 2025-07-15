@@ -199,7 +199,7 @@ O algoritmo implementa a construção de subconjuntos:
 ## 📁 Estrutura do Projeto
 
 ```
-├── index.html              # Arquivo principal da aplicação
+├── index.html              # Arquivo principal da aplicaçãog
 ```
 
 ## 🎨 Características da Interface
